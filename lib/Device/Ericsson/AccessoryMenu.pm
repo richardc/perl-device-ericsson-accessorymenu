@@ -1,6 +1,5 @@
 use strict;
 package Device::Ericsson::AccessoryMenu;
-use Device::Ericsson::AccessoryMenu::Slider;
 use base 'Class::Accessor::Fast';
 __PACKAGE__->mk_accessors( qw( states menu port debug callback ) );
 use vars qw( $VERSION );
@@ -260,13 +259,17 @@ sub control {
 
     print "# control '$line'\n" if $self->debug;
 
-    if ($line =~ /EAAI/) { # top level menu
-        $self->enter_state( 'Menu', menu => $self->menu );
+    if ( my ($state) = @{ $self->states } ) {
+        $state->handle( $line );
         return;
     }
 
-    my ($state) = @{ $self->states };
-    $state->handle( $line );
+    if ($line =~ /EAAI/) { # top level menu
+        $self->enter_state( 'Menu', data => $self->menu );
+        return;
+    }
+
+    warn "control got unexpected '$line'\n";
 }
 
 1;
