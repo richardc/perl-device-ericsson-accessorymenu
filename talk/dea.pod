@@ -3,7 +3,7 @@
 
 =meta consider_old 100
 
-=meta image_base /~richardc/talks/dea/
+=meta link_base /~richardc/talks/dea/
 
 =head1 Cool tricks with AT codes
 
