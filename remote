@@ -1,7 +1,7 @@
 #!/usr/local/bin/perl -w
 use lib qw(lib);
 use strict;
-use Device::T68i::Remote;
+use Device::Ericsson::AccessoryMenu;
 use Device::SerialPort;
 
 my $remote = Device::T68i::Remote->new;
