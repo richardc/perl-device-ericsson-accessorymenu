@@ -11,27 +11,24 @@ my $port = Device::SerialPort->new( '/dev/rfcomm0' ) or die;
 $remote->port( $port );
 
 my $xmms = Xmms::Remote->new;
+
+# start xmms if it isn't already
+sub start_xmms {
+    system ('xmms &') unless $xmms->is_running;
+}
 $remote->menu( [
     'Remote' => [
-        XMMS => sub {
-            # on enter, lauch if not launching already
-            system ('xmms &') unless $xmms->is_running;
-            my $volume = $xmms->get_main_volume;
-
-            return [
-                Play    => sub { $xmms->play;  return },
-                Pause   => sub { $xmms->pause; return },
-                Stop    => sub { $xmms->stop;  return },
-                Louder  => sub {
-                    $xmms->set_main_volume( $xmms->get_main_volume + 5);
-                    return;
-                },
-                Quieter => sub {
-                    $xmms->set_main_volume( $xmms->get_main_volume - 5);
-                    return;
-                },
-               ];
-        },
+        XMMS => [
+            "Play/Pause" => sub {
+                start_xmms;
+                $xmms->is_playing ? $xmms->pause : $xmms->play;
+            },
+            Back   => sub { $xmms->playlist_prev },
+            Next   => sub { $xmms->playlist_next },
+            Stop   => sub { $xmms->stop },
+            'Vol+' => sub { $xmms->set_main_volume($xmms->get_main_volume+5) },
+            'Vol-' => sub { $xmms->set_main_volume($xmms->get_main_volume-5) },
+           ],
         hello  => sub { my $r = shift; $r->send_text('hello, world', "isn't this fun"); return },
         time   => sub { scalar localtime },
         menu   => sub { [ foo => 'bar',] },
