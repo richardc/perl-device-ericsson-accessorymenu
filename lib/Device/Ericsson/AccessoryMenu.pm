@@ -138,6 +138,7 @@ sub expect {
         $answer =~ s/^[\r\n]+//;
         $answer =~ s/[\r\n]+$//;
     }
+
     print "# got '$answer'\n" if debug && defined $answer;
     return $answer;
 }
@@ -220,7 +221,7 @@ sub percent_slider {
     $self->send( qq{AT*EAID=4,2,"$title",$steps,$value} );
     $self->expect( 'OK' );
     while (1) {
-        my $got = $self->expect;
+        my $got = $self->expect('EAII');
         next unless defined $got;
         if ($got =~ /^\*EAII: 15,(\d+)$/) {
             $value = $1;
