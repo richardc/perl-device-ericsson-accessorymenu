@@ -47,18 +47,21 @@ sub handle {
 
         $self->selected( $item );
         print "invoking $item: $action\n" if $self->debug;
-        $action = $action->( $self ) if ref $action eq 'CODE';
+        $action = $action->( $self->parent ) if ref $action eq 'CODE';
+
         if (ref $action eq 'ARRAY') { # wander down
             $self->enter_state( 'Menu', data => [ $name => $action ] );
             return;
         }
+
         if (defined $action && !ref $action) {
             $self->enter_state( 'Text', ( title => $name,
                                           text  => $action ) );
             return;
         }
-        # update and resend
-        $self->on_enter;
+
+        # update and resend, if we're still in this state
+        $self->on_enter if $self->current_state == $self;
     }
 }
 

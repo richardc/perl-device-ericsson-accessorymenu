@@ -9,11 +9,11 @@ sub handle {
 
     if ($line =~ /^\*EAII: 15,(\d+)$/) {
         my $value = $1;
-        $self->callback($value) if $self->callback;
+        $self->callback->($value) if $self->callback;
         return;
     }
     if ($line =~ /\*EAII: [04]/) {
-        $self->parent->exit_state;
+        $self->exit_state;
         return;
     }
     warn "Slider got unexpected 'line'\n" if $self->parent->debug;

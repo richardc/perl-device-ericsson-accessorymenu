@@ -23,4 +23,9 @@ sub exit_state {
     $self->parent->exit_state( @_ );
 }
 
+sub current_state {
+    my $self = shift;
+    $self->parent->current_state;
+}
+
 1;

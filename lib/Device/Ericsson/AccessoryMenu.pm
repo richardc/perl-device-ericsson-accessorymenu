@@ -206,10 +206,11 @@ sub enter_state {
 
     $class = __PACKAGE__."::$class";
     eval "require $class" or die $@;
-    my $entering =  bless { parent => $self, @_ }, $class;
-    push @{ $self->states }, $entering;
-    print "entering $entering\n";
 
+    my $entering =  bless { parent => $self, @_ }, $class;
+    unshift @{ $self->states }, $entering;
+
+    print "entering $entering\n" if $self->debug;
     $entering->on_enter;
     return;
 }
@@ -217,12 +218,18 @@ sub enter_state {
 sub exit_state {
     my $self = shift;
 
-    my $leaving = pop @{ $self->states };
-    print "leaving $leaving\n";
+    my $leaving = shift @{ $self->states };
+    print "leaving $leaving\n" if $self->debug;
     $leaving->on_exit;
     my ($current) = @{ $self->states };
     $current->on_enter if $current;
     return;
+}
+
+sub current_state {
+    my $self = shift;
+    my ($state) = @{ $self->states };
+    return $state;
 }
 
 =head2 mouse_mode( %args )
@@ -259,7 +266,7 @@ sub control {
 
     print "# control '$line'\n" if $self->debug;
 
-    if ( my ($state) = @{ $self->states } ) {
+    if ( my $state = $self->current_state ) {
         $state->handle( $line );
         return;
     }
