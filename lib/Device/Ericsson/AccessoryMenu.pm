@@ -5,7 +5,7 @@ __PACKAGE__->mk_accessors( qw( parents current_menu menu port ) );
 use vars qw( $VERSION );
 $VERSION = '0.5';
 
-use constant debug => 0;
+use constant debug => 1;
 
 =head1 NAME
 
@@ -197,6 +197,40 @@ sub send_text {
     $self->expect( 'OK' );
     do {} while !$self->expect;
 }
+
+
+=head2 percent_slider( %args )
+
+ %args = (
+    title => 'Slider',
+    steps => 10,    # 1..10
+    value => 50,
+    callback => undef, # a subroute refernce
+ );
+
+=cut
+
+sub percent_slider {
+    my $self = shift;
+    my %args = @_;
+
+    my $title = $args{title} || 'Slider';
+    my $steps  = $args{steps}  || 10;
+    my $value = int( ( defined $args{value} ? $args{value} : 50 ) / 100 * $steps );
+    $self->send( qq{AT*EAID=4,2,"$title",$steps,$value} );
+    $self->expect( 'OK' );
+    while (1) {
+        my $got = $self->expect;
+        next unless defined $got;
+        if ($got =~ /^\*EAII: 15,(\d+)$/) {
+            $value = $1;
+            $args{callback}->($value) if $args{callback};
+        }
+        return $value if ($got =~ /^\*EAII: 4/);
+        return if $got eq '*EAII: 0'; # no
+    }
+}
+
 
 =head2 control
 

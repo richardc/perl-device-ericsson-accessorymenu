@@ -26,12 +26,21 @@ $remote->menu( [
             Back   => sub { $xmms->playlist_prev },
             Next   => sub { $xmms->playlist_next },
             Stop   => sub { $xmms->stop },
-            'Vol+' => sub { $xmms->set_main_volume($xmms->get_main_volume+5) },
-            'Vol-' => sub { $xmms->set_main_volume($xmms->get_main_volume-5) },
+            Volume => sub {
+                my $r = shift;
+                $r->percent_slider( value    => $xmms->get_main_volume,
+                                    steps    => 10,
+                                    callback => sub {
+                                        $xmms->set_main_volume( shift )
+                                    },
+                                   );
+                return;
+            }
            ],
         hello  => sub { my $r = shift; $r->send_text('hello, world', "isn't this fun"); return },
         time   => sub { scalar localtime },
         menu   => sub { [ foo => 'bar',] },
+        test   => sub { $_[0]->do_wait(qq{AT*EAID=4,2,"foo",10,70}); return },
        ],
    ]);
 
