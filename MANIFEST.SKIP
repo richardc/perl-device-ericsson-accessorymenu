@@ -1,0 +1,7 @@
+blib
+_build
+Makefile
+Build
+~$
+MANIFEST.SKIP
+\.svn
