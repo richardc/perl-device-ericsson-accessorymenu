@@ -5,7 +5,7 @@ use Device::Ericsson::AccessoryMenu;
 use Device::SerialPort;
 use Xmms::Remote;
 
-my $remote = Device::Ericsson::AccessoryMenu->new;
+my $remote = Device::Ericsson::AccessoryMenu->new( debug => 0 );
 
 my $port = Device::SerialPort->new( '/dev/rfcomm0' ) or die;
 $remote->port( $port );
@@ -75,6 +75,8 @@ $remote->menu( [
                                 });
             },
            ],
+        Restart => sub { exec $^X, $0 },
+        Quit    => sub { exit },
        ],
    ]);
 

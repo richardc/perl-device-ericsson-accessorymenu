@@ -1,11 +1,9 @@
 use strict;
 package Device::Ericsson::AccessoryMenu;
 use base 'Class::Accessor::Fast';
-__PACKAGE__->mk_accessors( qw( parents current_menu menu port ) );
+__PACKAGE__->mk_accessors( qw( parents current_menu menu port debug ) );
 use vars qw( $VERSION );
 $VERSION = '0.5';
-
-use constant debug => 1;
 
 =head1 NAME
 
@@ -50,7 +48,7 @@ applescript events, if that's your desire).
 
 sub new {
     my $class = shift;
-    $class->SUPER::new({ menu => [] });
+    $class->SUPER::new({ menu => [], @_ });
 }
 
 =head2 menu
@@ -84,17 +82,12 @@ sub send {
     my $what = shift;
     my $count = $self->port->write( "$what\r" );
     $self->port->write_drain;
-    print "# send '$what'\n" if debug;
+    print "# send '$what'\n" if $self->debug;
     return $count == length $what;
 }
 
-=head2 expect( $what, $timeout )
 
-expects something from the other end
-
-=cut
-
-# lifted from Device::Modem
+# Lifted from Device::Modem
 sub expect {
     my $self = shift;
     my ($expect, $timeout) = @_;
@@ -139,7 +132,7 @@ sub expect {
         $answer =~ s/[\r\n]+$//;
     }
 
-    print "# got '$answer'\n" if debug && defined $answer;
+    print "# got '$answer'\n" if $self->debug && defined $answer;
     return $answer;
 }
 
@@ -224,7 +217,7 @@ sub percent_slider {
     $self->send( qq{AT*EAID=4,2,"$title",$steps,$value} );
     $self->expect( 'OK' );
     while (1) {
-        my $got = $self->expect('EAII');
+        my $got = $self->expect("\r");
         next unless defined $got;
         if ($got =~ /^\*EAII: 15,(\d+)$/) {
             $value = $1;
@@ -232,15 +225,18 @@ sub percent_slider {
         }
         return $value if ($got =~ /^\*EAII: 4/);
         return if $got eq '*EAII: 0'; # no
+        warn "percent input got unexpected '$got'\n" if $self->debug;
     }
 }
 
 =head2 mouse_mode( %args )
 
+Put the T68i into a fullscan mode.  Returns keyboard events for every
+key pressed and released.
+
  %args = (
     title    => 'Mouse',
-    callback => sub ( $key, $updown ) {}, # a subroutine ref, will be
-                                          # called with the key and
+    callback => sub ( $key, $updown ) {}, # will be called with the key and
                                           # the updown event (1 = key
                                           # down, 0 = key up)
 
@@ -294,7 +290,7 @@ sub control {
     my $line = $self->expect("\r");
     return unless $line;
 
-    print "# control '$line'\n" if debug;
+    print "# control '$line'\n" if $self->debug;
 
     if ($line =~ /EAAI/) { # top level menu
         $self->send_menu;
@@ -341,6 +337,14 @@ Ericsson devices, but only time will tell.  Feedback welcome.
 
 Convenience methods for other C<EAID> values, like the percent input
 dialog.
+
+We probably want a blessing state machine thing going on, since things
+like mouse_mode and percent_slider really like to sit in a tight loop,
+but we still want to allow the program to do other things.
+
+Disconnection (and reconnection) detection.  For a straight serial
+port this isn't really much of an issue, but for bluetooth devices
+it'd be nifty to do a "they've entered/exited the zone" check.
 
 =head1 AUTHOR
 
