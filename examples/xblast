@@ -44,6 +44,7 @@ my $menu = Device::Ericsson::AccessoryMenu->new(
         Player2 => sub { translate_keys( shift, %player2 ) },
        ],
     ],
+    debug => 1,
    );
 
 $menu->register_menu;

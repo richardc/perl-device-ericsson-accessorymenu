@@ -4,6 +4,7 @@ use strict;
 use Device::Ericsson::AccessoryMenu;
 use Device::SerialPort;
 use Xmms::Remote;
+use X11::GUITest qw(SendKeys);
 
 my $xmms = Xmms::Remote->new;
 
@@ -51,8 +52,17 @@ my $remote = Device::Ericsson::AccessoryMenu->new(
                         );
                 },
                ],
+            X11Cursor => [ # slightly fake, but I want the tee
+                Space => sub { SendKeys(" ");     return },
+                Up    => sub { SendKeys("{UP}");  return },
+                Enter => sub { SendKeys("\n");    return },
+                Left  => sub { SendKeys("{LEF}"); return },
+                Down  => sub { SendKeys("{DOW}"); return },
+                Right => sub { SendKeys("{RIG}"); return },
+               ],
             # a bunch of bookmarklets
             Galeon => [
+                Space   => sub { SendKeys(" ");     return },
                 Back    => sub { galeon 'back()' },
                 Forward => sub { galeon 'forward()' },
                 Prev    => sub {
