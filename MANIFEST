@@ -5,5 +5,5 @@ SIGNATURE
 Build.PL
 Makefile.PL
 lib/Device/Ericsson/AccessoryMenu.pm
-remote
+examples/remote
 t/remote.t

@@ -1,6 +1,5 @@
 use strict;
 package Device::Ericsson::AccessoryMenu;
-use Device::SerialPort;
 use base 'Class::Accessor::Fast';
 __PACKAGE__->mk_accessors( qw( parents current_menu menu port ) );
 use vars qw( $VERSION );
@@ -100,7 +99,7 @@ sub expect {
     my $self = shift;
     my ($expect, $timeout) = @_;
 
-    $timeout ||= '';
+    $timeout ||= 0;
     $timeout = 2000 if $timeout < 2000;
 
     my $time_slice = 100;                       # single cycle wait time
@@ -120,11 +119,12 @@ sub expect {
             $answer .= $what;
             $idle_cycles = 1;
             $max_idle_cycles = 3;
-        } else {
+        }
+        else {
             ++$idle_cycles;
         }
 
-        ++$done if $expect && $answer && $answer =~ /$expect/;
+        ++$done if $expect && $answer && $answer =~ $expect;
         ++$done if $idle_cycles >= $max_idle_cycles;
         ++$done if ++$cycles >= $max_cycles;
         select(undef, undef, undef, $time_slice/1000) unless $done;

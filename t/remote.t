@@ -28,12 +28,12 @@ package DummyPort;
 # enough of the Device::SerialPort api to do some testing
 sub write {
     my ($self, $what) = @_;
+    $what =~ s/\r$//;
     print "# wrote '$what'\n";
-    return length $what;
 }
 
 sub write_drain { }
 
-sub read { "OK\r" }
+sub read { ( 3, "OK\r" ) }
 
 sub purge_all {}
