@@ -1,3 +1,4 @@
+Changes
 MANIFEST
 MANIFEST.SKIP
 META.yml
@@ -5,5 +6,9 @@ SIGNATURE
 Build.PL
 Makefile.PL
 lib/Device/Ericsson/AccessoryMenu.pm
+lib/Device/Ericsson/AccessoryMenu/State.pm
+lib/Device/Ericsson/AccessoryMenu/Menu.pm
+lib/Device/Ericsson/AccessoryMenu/Slider.pm
+lib/Device/Ericsson/AccessoryMenu/Text.pm
 examples/remote
 t/remote.t

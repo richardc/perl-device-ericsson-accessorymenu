@@ -4,6 +4,7 @@ use strict;
 use Device::Ericsson::AccessoryMenu;
 use Device::SerialPort;
 use Xmms::Remote;
+use X11::GUITest qw(PressKey ReleaseKey); # local modified version
 
 my $remote = Device::Ericsson::AccessoryMenu->new( debug => 0 );
 
@@ -76,11 +77,14 @@ $remote->menu( [
             Up      => sub { galeon 'scrollBy(0, -window.innerHeight)' },
             Top     => sub { galeon 'scrollBy(0, -document.body.scrollTop)' },
            ],
-        XBlast => sub {
-            use X11::GUITest qw(PressKey ReleaseKey);
-            PressKey('space');
-            sleep 1;
-            ReleaseKey('space');
+        X11Keys => sub {
+            my $r = shift;
+            my %keymap = map { chr($_) => chr($_) } 0..255;
+            $r->mouse_mode( callback => sub {
+                                my ($key, $updown) = @_;
+                                $updown ? PressKey($keymap{$key})
+                                        : ReleaseKey($keymap{$key});
+                            });
             return;
         },
         Test => [
