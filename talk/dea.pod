@@ -1,6 +1,10 @@
 # Note: This talk is not due to be presented until 2003-06-18 at
 # Birmingham Perl Mongers, so no peeking, m'kay
 
+=meta consider_old 100
+
+=meta image_base /~richardc/talks/dea/
+
 =head1 Cool tricks with AT codes
 
 =head2 With the power of my mind
@@ -34,6 +38,8 @@ allow me to trigger things from my phone.
 =item
 
 # XXX image of a phone menu
+
+L<image:a menu|bar.jpeg>
 
 =back
 
