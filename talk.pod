@@ -1,0 +1,337 @@
+# Note: This talk is not due to be presented until 2003-06-18 at
+# Birmingham Perl Mongers, so no peeking, m'kay
+
+=head1 Cool tricks with AT codes
+
+=head2 With the power of my mind
+
+=over
+
+=item
+
+I shall make music play
+
+=item
+
+I shall make it sunny outside
+
+=item
+
+I shall make this page magically change
+
+=back
+
+
+=head2 Okay, so I precanned my mind
+
+=over
+
+=item
+
+I wrote a script which calls on L<Device::Ericsson::AccessoryMenu> to
+allow me to trigger things from my phone.
+
+=item
+
+# XXX image of a phone menu
+
+=back
+
+
+=head2 Clicker / Romeo
+
+=over
+
+=item 
+
+Mac OS X applications
+
+# XXX screenshots
+
+=item
+
+You write your actions in applescript
+
+# XXX some applescript
+
+=back
+
+
+=head2 Two Drawbacks
+
+=over
+
+=item
+
+This machine is not running Mac OS X
+
+=item
+
+I don't speak applescript
+
+=back
+
+
+=head2 BlueXMMS
+
+=over
+
+=item
+
+Ruby program that remote controls XMMS
+
+=item
+
+Grokable, but very entwined code
+
+=item
+
+So for the first version of my code I stole mostly from that,
+splitting up the AT-slinging code from the actions
+
+=back
+
+
+=head2 A simple XMMS remote
+
+=over
+
+=item
+
+ #!/usr/local/bin/perl -w
+ use strict;
+ use Device::Ericsson::AccessoryMenu;
+ use Device::SerialPort;
+ use Xmms::Remote;
+ 
+ my $xmms = Xmms::Remote->new;
+ my $menu = Device::Ericsson::AccessoryMenu->new(
+     port => Device::SerialPort->open( '/dev/rfcomm0' ) || die,
+     menu => [ XMMS => [
+                  "Play/Pause" => sub {
+                       $xmms->is_playing ? $xmms->pause : $xmms->play;
+                   },
+                   Back => sub { $xmms->playlist_prev },
+                   Next => sub { $xmms->playlist_next },
+                   Stop => sub { $xmms->stop },
+                 ],
+	     ],
+ );
+
+ $menu->control while 1;
+
+=back
+
+
+=head2 Sliders
+
+=over
+
+=item
+
+We can invoke other kinds of widgets too, like this volume slider
+
+# XXX image
+
+=item
+
+              Volume => sub {
+                  my $r = shift;
+                  $r->percent_slider(
+                      title    => 'Volume',
+                      value    => $xmms->get_main_volume,
+                      steps    => 10,
+                      callback => sub {
+                          $xmms->set_main_volume( shift )
+                      },
+                  );
+                  return;
+	      },
+
+=back
+
+
+=head2 Event Loops
+
+=over
+
+=item
+
+Everything likes to have its own event loop; L<Tk>, L<GTK>, L<POE>
+certainly do.
+
+=item
+
+As a lowly utility module we want to stay out of the way of those, and
+not trap the user into a(nother) busy loop.
+
+=back
+
+
+=head2 Mmmm, Statey
+
+=over
+
+=item
+
+Since we expect the phone to send different messages when it's
+displaying a C<Slider> than when it's displaying a C<Menu> we can either:
+
+=item
+
+Continue to kludge tests into a really big if/then/else statement.
+Eventually go insane.
+
+=item
+
+Do something stateful.
+
+=back
+
+
+=head2 I like pie
+
+=over
+
+=item
+
+# XXX picture of pie
+
+=item
+
+I also like state machines
+
+=item
+
+C<enter_state> we push a new state onto the stack, and call its
+C<on_enter> method
+
+=item
+
+C<exit_state> - we pop the top, call it's C<on_exit> method, and the
+new tops C<on_enter>
+
+=item
+
+in C<control> we call the topmost states C<handle> method
+
+=back
+
+=head2 Inside the Text state
+
+=over
+
+=item
+
+C<Text> is probably the simplest state:
+
+Set up the parentage, and add some accessors
+
+ use strict;
+ package Device::Ericsson::AccessoryMenu::Text;
+ use base 'Device::Ericsson::AccessoryMenu::State';
+ __PACKAGE__->mk_accessors( qw( title lines ) );
+
+C<on_enter> we just send the dialog over
+
+ sub on_enter {
+     my $self = shift;
+
+     my $title = $self->title;
+     $self->send( join ',',
+                  qq{AT*EAID=14,2,"$title"},
+                  map { qq{"$_"} } @{ $self->lines }
+                 );
+     $self->expect( 'OK' );
+ }
+
+And whatever value our C<handler> gets, it means I<leave this state>
+
+ sub handle {
+     my $self = shift;
+     $self->exit_state;
+ }
+ 
+ 1;
+
+That's all there is to it.
+
+=back
+
+
+=head2 Bob's your Uncle
+
+=over
+
+=item
+
+# XXX picture of Bob Holness
+
+=back
+
+
+=head2 What you can control
+
+=over
+
+=item XMMS
+
+L<Xmms::Remote> is your underdocumented friend.
+
+Also check out
+L<examples/remote|http://unixbeard.net/svn/richardc/perl/Device-Ericsson-AccessoryMenu/examples/remote>
+in the L<Device::Ericsson::AccessoryMenu> distribution.
+
+=item Galeon
+
+You just write bookmarklets and invoke them via C<system>
+
+=item Everything else
+
+Well, anything you can write Perl for at least
+
+=back
+
+
+=head2 A Demo
+
+=over
+
+=item
+
+We're going to use the C<Mouse> state.
+
+=item
+
+And remap the events into X11 key presses/releases
+
+=item
+
+# XXX sample code
+
+
+=back
+
+
+=head2 What's next
+
+=over
+
+=item
+
+Couple more dialog types to add, if they're useful.
+
+=item
+
+With luck someone will write a nice frontend for building menus,
+possibly shipping a bunch of precanned menus
+
+=back
+
+=head2 Questions
+
+=head1 Footer
+
+More than you ever needed to know about L<Device::Ericsson::AccessoryMenu>.
+
+E<copy> 2003, Richard Clamp
