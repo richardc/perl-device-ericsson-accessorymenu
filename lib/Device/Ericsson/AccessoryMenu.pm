@@ -3,7 +3,7 @@ package Device::Ericsson::AccessoryMenu;
 use base 'Class::Accessor::Fast';
 __PACKAGE__->mk_accessors( qw( states menu port debug callback ) );
 use vars qw( $VERSION );
-$VERSION = '0.6';
+$VERSION = '0.7';
 
 =head1 NAME
 

@@ -7,9 +7,10 @@ SIGNATURE
 Build.PL
 Makefile.PL
 lib/Device/Ericsson/AccessoryMenu.pm
-lib/Device/Ericsson/AccessoryMenu/State.pm
 lib/Device/Ericsson/AccessoryMenu/Menu.pm
+lib/Device/Ericsson/AccessoryMenu/Mouse.pm
 lib/Device/Ericsson/AccessoryMenu/Slider.pm
+lib/Device/Ericsson/AccessoryMenu/State.pm
 lib/Device/Ericsson/AccessoryMenu/Text.pm
 examples/remote
 examples/xblast

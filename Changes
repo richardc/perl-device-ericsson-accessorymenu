@@ -1,3 +1,9 @@
+0.7	Monday 22nd September, 2003
+	Fixed a packageing mistake - we weren't shipping 
+	lib/Device/Ericsson/AccessoryMenu/Mouse.pm due to a glitch in
+	MANIFEST.SKIP
+
+
 0.6	Wednesday 25th June, 2003
 	Rewrote everything to be stateful.  We now have a stack of
 	states.  You can enter a new state, or exit and query the
