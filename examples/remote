@@ -17,7 +17,7 @@ my $port = shift || '/dev/rfcomm0';
 
 my $remote = Device::Ericsson::AccessoryMenu->new(
     debug => 1,
-    port  => Device::SerialPort->new( '/dev/rfcomm1' ) || die,
+    port  => Device::SerialPort->new( $port ) || die,
     menu  => [
         'Remote' => [
             XMMS => [
