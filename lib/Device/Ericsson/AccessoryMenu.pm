@@ -291,7 +291,7 @@ callbacks and all that jazz.
 sub control {
     my $self = shift;
 
-    my $line = $self->expect;
+    my $line = $self->expect("\r");
     return unless $line;
 
     print "# control '$line'\n" if debug;
