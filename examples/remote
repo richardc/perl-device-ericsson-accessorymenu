@@ -12,15 +12,17 @@ $remote->port( $port );
 
 my $xmms = Xmms::Remote->new;
 
-# start xmms if it isn't already
-sub start_xmms {
-    system ('xmms &') unless $xmms->is_running;
+#invoke galeon
+sub galeon ($) {
+    system qw( galeon -x ), "javascript:". shift;
+    return;
 }
 $remote->menu( [
     'Remote' => [
         XMMS => [
             "Play/Pause" => sub {
-                start_xmms;
+                # start xmms if it isn't already
+                system ('xmms &') unless $xmms->is_running;
                 $xmms->is_playing ? $xmms->pause : $xmms->play;
             },
             Back   => sub { $xmms->playlist_prev },
@@ -41,13 +43,23 @@ $remote->menu( [
             "Now Playing"  => sub {
                 return "nothing" unless $xmms->is_playing;
                 my $pos = $xmms->get_playlist_pos + 1;
-                my ($rate, $freq, $nch) = $xmms->get_info;
-                return join( '',
-                             $pos, " of ", $xmms->get_playlist_length,
-                             ". ", $xmms->get_playlist_titles->[ $pos - 1 ],
-                             " ",  $xmms->get_output_timestr,
-                            );
+                join(' ',
+                     $pos, "of", $xmms->get_playlist_length, ".",
+                     $xmms->get_playlist_titles->[ $pos - 1 ],
+                     $xmms->get_output_timestr
+                    );
             },
+           ],
+        # a nuch of bookmarklets
+        Galeon => [
+            Back     => sub { galeon 'back()' },
+            Forward  => sub { galeon 'forward()' },
+            # XXX complicty with podblog
+            Previous => sub { galeon 'document.location = document.getElementById("prev").href' },
+            Next     => sub { galeon 'document.location = document.getElementById("next").href' },
+            Top      => sub { galeon 'scrollBy(0, -document.body.scrollTop)' },
+            Up       => sub { galeon 'scrollBy(0, -window.innerHeight)' },
+            Down     => sub { galeon 'scrollBy(0,  window.innerHeight)' },
            ],
         hello  => sub { my $r = shift; $r->send_text('hello, world', "isn't this fun"); return },
         time   => sub { scalar localtime },
