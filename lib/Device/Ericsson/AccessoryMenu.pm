@@ -169,10 +169,7 @@ sub send_text {
     my $title = shift;
     @_ = ($title) unless @_;
 
-    $self->send( join ',', qq{AT*EAID=14,2,"$title"}, map { qq{"$_"} } @_ );
-    $self->expect( 'OK' );
-    do {} while !$self->expect;
-    return;
+    $self->enter_state( 'Text', title => $title, lines => \@_ );
 }
 
 
@@ -191,13 +188,11 @@ sub percent_slider {
     my $self = shift;
     my %args = @_;
 
-    my $title = $args{title} || 'Slider';
-    my $steps  = $args{steps}  || 10;
-    my $value = int( ( defined $args{value} ? $args{value} : 50 ) / 100 * $steps );
-    $self->send( qq{AT*EAID=4,2,"$title",$steps,$value} );
-    $self->expect( 'OK' );
-
-    $self->enter_state( 'Slider', callback => $args{callback} );
+    my $value = defined $args{value} ? $args{value}: 50;
+    $self->enter_state( 'Slider', ( title => $args{title} || 'Slider',
+                                    steps => $args{steps}  || 10,
+                                    value => $value,
+                                    callback => $args{callback} ) );
 }
 
 sub enter_state {
@@ -292,10 +287,6 @@ Ericsson devices, but only time will tell.  Feedback welcome.
 
 Convenience methods for other C<EAID> values, like the percent input
 dialog.
-
-We probably want a blessing state machine thing going on, since things
-like mouse_mode and percent_slider really like to sit in a tight loop,
-but we still want to allow the program to do other things.
 
 Disconnection (and reconnection) detection.  For a straight serial
 port this isn't really much of a win, but for bluetooth devices it'd

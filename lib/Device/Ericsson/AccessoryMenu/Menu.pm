@@ -55,8 +55,7 @@ sub handle {
         }
 
         if (defined $action && !ref $action) {
-            $self->enter_state( 'Text', ( title => $name,
-                                          text  => $action ) );
+            $self->parent->send_text( $name, $action );
             return;
         }
 

@@ -1,7 +1,19 @@
 use strict;
 package Device::Ericsson::AccessoryMenu::Slider;
 use base 'Device::Ericsson::AccessoryMenu::State';
-__PACKAGE__->mk_accessors( 'callback' );
+__PACKAGE__->mk_accessors( qw( callback value steps title ) );
+
+
+sub on_enter {
+    my $self = shift;
+
+    my $title = $self->title;
+    my $steps = $self->steps;
+    my $value = $self->value / 100 * $steps; # starting step
+
+    $self->send( qq{AT*EAID=4,2,"$title",$steps,$value} );
+    $self->expect( 'OK' );
+}
 
 sub handle {
     my $self = shift;
