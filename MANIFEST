@@ -3,7 +3,6 @@ README
 MANIFEST
 MANIFEST.SKIP
 META.yml
-SIGNATURE
 Build.PL
 Makefile.PL
 lib/Device/Ericsson/AccessoryMenu.pm
