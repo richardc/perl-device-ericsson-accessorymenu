@@ -12,6 +12,5 @@ Module::Build
              'Device::SerialPort' => 0,
          },
          create_makefile_pl => 'traditional',
-         sign => 1,
        )
   ->create_build_script;
