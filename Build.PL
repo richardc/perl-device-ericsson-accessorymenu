@@ -2,7 +2,7 @@ use strict;
 use Module::Build;
 
 Module::Build
-  ->new( module_name => "Device::T68i::Remote",
+  ->new( module_name => "Device::Ericsson::AccessoryMenu",
          license     => 'perl',
          requires    => {
              'Device::SerialPort' => 0,

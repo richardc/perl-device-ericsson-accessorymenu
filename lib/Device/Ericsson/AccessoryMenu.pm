@@ -1,5 +1,5 @@
 use strict;
-package Device::T68i::Remote;
+package Device::Ericsson::AccessoryMenu;
 use Device::SerialPort;
 use base 'Class::Accessor::Fast';
 __PACKAGE__->mk_accessors( qw( parents current_menu menu port ) );
@@ -9,11 +9,11 @@ use constant debug => 0;
 
 =head1 NAME
 
-Device::T68i::Remote - allows use of a T68i as a remote control
+Device::Ericsson::AccessoryMenu - allows use of a T68i as a remote control
 
 =head1 SYNOPSIS
 
- my $remote = Device::T68i::Remote->new;
+ my $remote = Device::Ericsson::AccessoryMenu->new;
  $remote->menu( [ 'Remote' => [ pause  => sub { ... },
                                 Volume => [ up   => sub { ... },
                                             down => sub { ... },
@@ -34,10 +34,10 @@ Device::T68i::Remote - allows use of a T68i as a remote control
 
 =head1 DESCRIPTION
 
-Device::T68i::Remote provides a framework for remote-controlling the
-host application via a custom menu on your T68i.
+Device::Ericsson::AccessoryMenu provides a framework for adding an accessory
+menu to devices that obey the EAM series of AT commands.
 
-This is similar to the Romeo and Clicker applications for OSX, only
+This allows you to write programs with similar function to the Romeo and Clicker applications for OSX, only
 instead of applescript your actions invoke perl subroutines (which of
 course may invoke applescript events, if that's your desire).
 
@@ -57,7 +57,7 @@ sub new {
 your menus and actions.
 
 if your action is a subroutine, it will be invoked with the
-Device::T68i::Remote object as its first parameter.
+Device::Ericsson::AccesoryMenu object as its first parameter.
 
 =head2 port
 

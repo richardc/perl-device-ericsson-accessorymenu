@@ -4,7 +4,7 @@ use strict;
 use Device::Ericsson::AccessoryMenu;
 use Device::SerialPort;
 
-my $remote = Device::T68i::Remote->new;
+my $remote = Device::Ericsson::AccessoryMenu->new;
 
 my $port = Device::SerialPort->new( '/dev/rfcomm0' ) or die;
 $remote->port( $port );

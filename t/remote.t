@@ -2,9 +2,9 @@
 use strict;
 use Test::More tests => 2;
 
-my $pkg = 'Device::T68i::Remote';
-use_ok('Device::T68i::Remote');
-my $remote = Device::T68i::Remote->new;
+my $pkg = 'Device::Ericsson::AccessoryMenu';
+use_ok( $pkg );
+my $remote = $pkg->new;
 
 isa_ok( $remote, $pkg );
 
@@ -25,9 +25,15 @@ $remote->register_menu;
 $remote->send_menu;
 
 package DummyPort;
+# enough of the Device::SerialPort api to do some testing
 sub write {
     my ($self, $what) = @_;
     print "# wrote '$what'\n";
     return length $what;
 }
 
+sub write_drain { }
+
+sub read { "OK\r" }
+
+sub purge_all {}
