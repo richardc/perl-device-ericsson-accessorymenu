@@ -28,7 +28,7 @@ sub handle {
         $self->exit_state;
         return;
     }
-    warn "Slider got unexpected 'line'\n" if $self->parent->debug;
+    warn "Slider got unexpected 'line'\n" if $self->debug;
 }
 
 1;

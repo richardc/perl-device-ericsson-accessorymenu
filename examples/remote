@@ -89,7 +89,7 @@ $remote->menu( [
                 $r->send_text('hello, world', "isn't this fun");
             },
             "Dynamic Menu" => sub { [ Literal => 'What we have here is failure to communicate',] },
-            mouse  => sub {
+            Mouse  => sub {
                 my $r = shift;
                 $r->mouse_mode( callback => sub {
                                     my ($key, $updown) = @_;

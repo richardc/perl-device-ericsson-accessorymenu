@@ -158,6 +158,39 @@ sub register_menu {
     $self->expect( "OK" );
 }
 
+sub enter_state {
+    my $self = shift;
+    my $class = shift;
+
+    $class = __PACKAGE__."::$class";
+    eval "require $class" or die $@;
+
+    my $entering =  bless { parent => $self, @_ }, $class;
+    unshift @{ $self->states }, $entering;
+
+    print "entering $entering\n" if $self->debug;
+    $entering->on_enter;
+    return;
+}
+
+sub exit_state {
+    my $self = shift;
+
+    my $leaving = shift @{ $self->states };
+    print "leaving $leaving\n" if $self->debug;
+    $leaving->on_exit;
+    my ($current) = @{ $self->states };
+    $current->on_enter if $current;
+    return;
+}
+
+sub current_state {
+    my $self = shift;
+    my ($state) = @{ $self->states };
+    return $state;
+}
+
+
 =head2 send_text( $title, @lines )
 
 Send the text as a message dialog and wait for user input.
@@ -195,38 +228,6 @@ sub percent_slider {
                                     callback => $args{callback} ) );
 }
 
-sub enter_state {
-    my $self = shift;
-    my $class = shift;
-
-    $class = __PACKAGE__."::$class";
-    eval "require $class" or die $@;
-
-    my $entering =  bless { parent => $self, @_ }, $class;
-    unshift @{ $self->states }, $entering;
-
-    print "entering $entering\n" if $self->debug;
-    $entering->on_enter;
-    return;
-}
-
-sub exit_state {
-    my $self = shift;
-
-    my $leaving = shift @{ $self->states };
-    print "leaving $leaving\n" if $self->debug;
-    $leaving->on_exit;
-    my ($current) = @{ $self->states };
-    $current->on_enter if $current;
-    return;
-}
-
-sub current_state {
-    my $self = shift;
-    my ($state) = @{ $self->states };
-    return $state;
-}
-
 =head2 mouse_mode( %args )
 
 Put the T68i into a fullscan mode.  Returns keyboard events for every
@@ -241,6 +242,14 @@ key pressed and released.
  );
 
 =cut
+
+sub mouse_mode {
+    my $self = shift;
+    my %args = @_;
+
+    $self->enter_state( 'Mouse', ( title => $args{title} || 'Mouse',
+                                   callback => $args{callback} ) );
+}
 
 
 =head2 control
