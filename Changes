@@ -1,3 +1,12 @@
+0.8	Monday 8th March, 2004
+	Applied the following patch by Arne Georg Gleditsch:
+		Added examples/x11pointer
+		Added xmms playlist clear/add directory to examples/remote 
+		Reworking of the timeout code to allow for better co-operation
+		with foreign event loops.
+		Setting of the default charset
+	Thanks Arne!
+
 0.7	Monday 22nd September, 2003
 	Fixed a packageing mistake - we weren't shipping 
 	lib/Device/Ericsson/AccessoryMenu/Mouse.pm due to a glitch in

@@ -92,10 +92,10 @@ sub expect {
     my $self = shift;
     my ($expect, $timeout) = @_;
 
-    $timeout ||= 0;
-    $timeout = 2000 if $timeout < 2000;
+    $timeout ||= 2000;
 
     my $time_slice = 100;                       # single cycle wait time
+    $time_slice = 20 if $timeout < 200;
     my $max_cycles = $timeout / $time_slice;
     my $max_idle_cycles = $max_cycles;
 
@@ -105,13 +105,13 @@ sub expect {
     # Main read cycle
     my ($answer, $cycles, $idle_cycles);
     do {
-        my ($howmany, $what) = $self->port->read(100);
+        my ($howmany, $what) = $self->port->read($time_slice);
 
         # Timeout count incremented only on empty readings
         if ( defined $what && $howmany > 0 ) {
             $answer .= $what;
             $idle_cycles = 1;
-            $max_idle_cycles = 3;
+            #$max_idle_cycles = $max_cycles;
         }
         else {
             ++$idle_cycles;
@@ -156,6 +156,9 @@ sub register_menu {
     $self->expect( "OK" );
     $self->send( 'AT*EAM="'. $self->menu->[0] . '"' );
     $self->expect( "OK" );
+    $self->send( 'AT+CSCS="8859-1"' );
+    $self->expect( "OK" );
+
 }
 
 sub enter_state {
@@ -261,11 +264,12 @@ callbacks and all that jazz.
 
 sub control {
     my $self = shift;
+    my ($timeout) = @_;
 
     # $self->port->modemlines; may be the key to 'it's attached, it's
     # not attached' stuff
 
-    my $line = $self->expect("\r");
+    my $line = $self->expect("\r", $timeout);
     return unless $line;
 
     print "# control '$line'\n" if $self->debug;

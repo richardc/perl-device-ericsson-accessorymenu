@@ -14,4 +14,5 @@ lib/Device/Ericsson/AccessoryMenu/State.pm
 lib/Device/Ericsson/AccessoryMenu/Text.pm
 examples/remote
 examples/xblast
+examples/x11pointer
 t/remote.t

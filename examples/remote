@@ -14,6 +14,40 @@ sub galeon ($) {
     return;
 }
 
+#xmms playlist selector
+sub directory_selector {
+    my ($path, $skip) = @_;
+
+    $skip ||= 0;
+    warn "$path $skip";
+    opendir(my $d, $path);
+    my @res;
+
+    my $length = 0;
+    my @content = sort grep { $_ !~ /^[.]/ and $_ ne 'lost+found' } readdir($d);
+
+    foreach my $i ($skip..$#content) {
+	my $n = $content[$i];
+	my $d = $n;
+	$d = substr($d, 0, 12)."..." if length($d) > 15;
+	if (-d "$path/$n") {
+	    push(@res, $d => sub { directory_selector("$path/$n") });
+	}
+	else {
+	    push(@res, $d => sub { $xmms->playlist_add(["$path/$n"]) });
+	}
+	$length += length($d)+3;
+	if ($length > 170 and $i < $#content) { 
+	    push(@res, "-->" => sub { directory_selector("$path", $i+1) });
+	    last;
+	}
+    }
+    closedir($d);
+
+    return \@res;
+}
+
+
 my $port = shift || '/dev/rfcomm0';
 
 my $remote = Device::Ericsson::AccessoryMenu->new(
@@ -42,6 +76,8 @@ my $remote = Device::Ericsson::AccessoryMenu->new(
                        );
                     return;
                 },
+		"Clear playlist" => sub { $xmms->playlist_clear },
+		"Add to playlist" => sub { directory_selector("/") },
                 "Now Playing"  => sub {
                     return "nothing" unless $xmms->is_playing;
                     my $pos = $xmms->get_playlist_pos + 1;
