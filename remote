@@ -1,0 +1,31 @@
+#!/usr/local/bin/perl -w
+use lib qw(lib);
+use strict;
+use Device::T68i::Remote;
+use Device::SerialPort;
+
+my $remote = Device::T68i::Remote->new;
+
+my $port = Device::SerialPort->new( '/dev/rfcomm0' ) or die;
+$remote->port( $port );
+
+$remote->menu( [
+    'Remote' => [
+        pause  => sub { print "# paused\n"; return },
+        Volume => [
+            up   => sub { print "# vol +\n"; return },
+            down => sub { print "# vol -\n"; return },
+           ],
+
+        hello  => sub { my $r = shift; $r->send_text('hello, world', "isn't this fun"); return },
+        time   => sub { scalar localtime },
+        menu   => sub { [ foo => 'bar',] },
+       ],
+   ]);
+
+$remote->register_menu;
+
+while (1) {
+    $remote->control;
+}
+
