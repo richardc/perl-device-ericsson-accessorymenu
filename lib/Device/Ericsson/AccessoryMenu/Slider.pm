@@ -9,7 +9,7 @@ sub on_enter {
 
     my $title = $self->title;
     my $steps = $self->steps;
-    my $value = $self->value / 100 * $steps; # starting step
+    my $value = int( $self->value / 100 * $steps ); # starting step
 
     $self->send( qq{AT*EAID=4,2,"$title",$steps,$value} );
     $self->expect( 'OK' );
