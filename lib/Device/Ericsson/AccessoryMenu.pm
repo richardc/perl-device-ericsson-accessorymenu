@@ -3,7 +3,8 @@ package Device::Ericsson::AccessoryMenu;
 use Device::SerialPort;
 use base 'Class::Accessor::Fast';
 __PACKAGE__->mk_accessors( qw( parents current_menu menu port ) );
-our $VERSION = '1.0';
+use vars qw( $VERSION );
+$VERSION = '0.5';
 
 use constant debug => 0;
 
@@ -34,12 +35,13 @@ Device::Ericsson::AccessoryMenu - allows use of a T68i as a remote control
 
 =head1 DESCRIPTION
 
-Device::Ericsson::AccessoryMenu provides a framework for adding an accessory
-menu to devices that obey the EAM series of AT commands.
+Device::Ericsson::AccessoryMenu provides a framework for adding an
+accessory menu to devices that obey the EAM set of AT commands.
 
-This allows you to write programs with similar function to the Romeo and Clicker applications for OSX, only
-instead of applescript your actions invoke perl subroutines (which of
-course may invoke applescript events, if that's your desire).
+This allows you to write programs with similar function to the Romeo
+and Clicker applications for OSX, only instead of applescript your
+actions invoke perl subroutines (which of course may invoke
+applescript events, if that's your desire).
 
 =head1 METHODS
 
@@ -56,17 +58,23 @@ sub new {
 
 your menus and actions.
 
-if your action is a subroutine, it will be invoked with the
+If your action is a subroutine, it will be invoked with the
 Device::Ericsson::AccesoryMenu object as its first parameter.
+
+If the action returns a scalar, this is sent on to the phone via
+C<send_text>
+
+If your action is, or returns an array reference, then it's taken as a
+sub menu.
 
 =head2 port
 
 The serial port to communicate over.
 
 This may be real serial port, or a bluetooth RFCOMM device, just so
-long as it looks like a filehandle.
+long as it looks like a Device::SerialPort or Win32::SerialPort.
 
-=head2 send( $what, $timeout )
+=head2 send( $what )
 
 send bytes over the serial port to the phone
 
@@ -92,9 +100,8 @@ sub expect {
     my $self = shift;
     my ($expect, $timeout) = @_;
 
-    if ( ( $timeout || 0 ) < 2000 ) {
-        $timeout = 2000;   # default wait (ms)
-    }
+    $timeout ||= '';
+    $timeout = 2000 if $timeout < 2000;
 
     my $time_slice = 100;                       # single cycle wait time
     my $max_cycles = $timeout / $time_slice;
@@ -138,6 +145,8 @@ sub expect {
 
 =head2 register_menu
 
+Notify the phone that there's an accessory connected
+
 =cut
 
 sub register_menu {
@@ -175,6 +184,8 @@ sub send_menu {
 
 =head2 send_text( $title, @lines )
 
+Send the text as a message dialog and wait for user input.
+
 =cut
 
 sub send_text {
@@ -189,8 +200,8 @@ sub send_text {
 
 =head2 control
 
-Respond to what the phone is sending to and from, invoking callbacks
-and all that jazz.
+Respond to what the phone is sending back over the port, invoking
+callbacks and all that jazz.
 
 =cut
 
@@ -236,11 +247,29 @@ sub control {
 1;
 __END__
 
+=head1 CAVEATS
+
+I have only tested this with a T68i, and with Device::SerialPort.
+I've consulted the R320 command set, and this seems portable across
+Ericsson devices, but only time will tell.  Feedback welcome.
+
+=head1 TODO
+
+Convenience methods for other C<EAID> values, like the percent input
+dialog.
+
 =head1 AUTHOR
 
 Richard Clamp <richardc@unixbeard.net>
 
 Based on the source of bluexmms by Tom Gilbert.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2003, Richard Clamp.  All Rights Reserved.
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
