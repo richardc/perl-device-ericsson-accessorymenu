@@ -64,17 +64,32 @@ L<image:Clicker|SEC_Phone_Menu.gif>
 
 You write your actions in applescript
 
- tell application "Safari"
-   activate
-   set the URL of document 1 to "http://www.XXXXXXX.com"
-   my new_tab()
-   set the URL of document 1 to "http://www.XXXXXX.com"
- end tell
- on new_tab()
-   tell application "Safari" to activate
-   tell application "System Events"
-     tell process "Safari"
-       event prcsclic
+ try
+   tell application "iTunes"
+     try
+       set the current_track to get current track
+     on error
+       error "No current track."
+     end try
+     set the track_count to (the count of tracks of the current playlist) as string
+     next track
+     try
+       set this_track to get current track
+     on error
+       play current_track
+       set this_track to the current_track
+       play track 1 of current playlist
+       set this_track to get current track
+     end try
+     set the track_index to (the index of this_track) as string
+     set this_title to the name of this_track as string
+     return (track_index & "/" & track_count & "  " & this_title)
+   end tell
+ on error error_message
+   return error_message
+ end try
+
+That's how you tell iTunes to play the next track
 
 =back
 
@@ -145,6 +160,50 @@ splitting up the AT-slinging code from the actions
  $menu->register_menu;
 
  $menu->control while 1;
+
+=back
+
+
+=head2 Slight return:  The unholy power of Perl
+
+=over
+
+=item
+
+$music_player, kindly play the next track.
+
+=item applescript
+
+ try
+   tell application "iTunes"
+     try
+       set the current_track to get current track
+     on error
+       error "No current track."
+     end try
+     set the track_count to (the count of tracks of the current playlist) as string
+     next track
+     try
+       set this_track to get current track
+     on error
+       play current_track
+       set this_track to the current_track
+       play track 1 of current playlist
+       set this_track to get current track
+     end try
+     set the track_index to (the index of this_track) as string
+     set this_title to the name of this_track as string
+     return (track_index & "/" & track_count & "  " & this_title)
+   end tell
+ on error error_message
+   return error_message
+ end try
+
+=item Perl
+
+ use Xmms::Remote;
+ my $xmms = Xmms::Remote->new;
+ $xmms->playlist_next;
 
 =back
 
@@ -312,17 +371,19 @@ L<image:Bob Holness|bobholness_card.gif>
 
 L<Xmms::Remote> is your underdocumented friend.
 
-Also check out
-L<examples/remote|http://unixbeard.net/svn/richardc/perl/Device-Ericsson-AccessoryMenu/examples/remote>
-in the L<Device::Ericsson::AccessoryMenu> distribution.
-
 =item Galeon
 
 You just write bookmarklets and invoke them via C<system>
 
 =item Everything else
 
-Well, anything you can write Perl for at least
+Well, anything you can write Perl for at least.
+
+Check out
+L<examples/remote|http://unixbeard.net/svn/richardc/perl/Device-Ericsson-AccessoryMenu/examples/remote>
+in the L<Device::Ericsson::AccessoryMenu> distribution.  It's the
+remote I'm using for this presentation, and already includes XMMS and
+Galeon menus.
 
 =back
 
@@ -333,13 +394,8 @@ Well, anything you can write Perl for at least
 
 =item
 
-We're going to use the C<Mouse> state.
-
-=item
-
-And remap the events into X11 key presses/releases
-
-=item
+It's fairly straightforward to use the C<Mouse> state and remap the
+events into X11 keypresses.
 
  #!/usr/local/bin/perl -w
  use lib qw(lib);
@@ -374,6 +430,10 @@ And remap the events into X11 key presses/releases
      ],
     );
 
+=item
+
+Being Perl this naturally has a real and practical application.
+
 =back
 
 
@@ -389,6 +449,12 @@ Couple more dialog types to add, if they're useful.
 
 With luck someone will write a nice frontend for building menus,
 possibly shipping a bunch of precanned menus
+
+=item
+
+More pie
+
+L<image:Pie!|apple-pie.jpeg>
 
 =back
 
