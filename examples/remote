@@ -5,7 +5,7 @@ use Device::Ericsson::AccessoryMenu;
 use Device::SerialPort;
 use Xmms::Remote;
 
-my $remote = Device::Ericsson::AccessoryMenu->new( debug => 0 );
+my $remote = Device::Ericsson::AccessoryMenu->new( debug => 1 );
 
 my $port = Device::SerialPort->new( '/dev/rfcomm0' ) or die;
 $remote->port( $port );
@@ -76,6 +76,13 @@ $remote->menu( [
             Up      => sub { galeon 'scrollBy(0, -window.innerHeight)' },
             Top     => sub { galeon 'scrollBy(0, -document.body.scrollTop)' },
            ],
+        XBlast => sub {
+            use X11::GUITest qw(PressKey ReleaseKey);
+            PressKey('space');
+            sleep 1;
+            ReleaseKey('space');
+            return;
+        },
         Test => [
             "Send Text" => sub {
                 my $r = shift;
