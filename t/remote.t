@@ -22,8 +22,6 @@ $remote->port( bless {}, 'DummyPort' );
 
 $remote->register_menu;
 
-$remote->send_menu;
-
 package DummyPort;
 # enough of the Device::SerialPort api to do some testing
 sub write {

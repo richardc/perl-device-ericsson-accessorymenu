@@ -1,4 +1,4 @@
-HEAD
+0.6	Wednesday 25th June, 2003
 	Rewrote everything to be stateful.  We now have a stack of
 	states.  You can enter a new state, or exit and query the
 	current state. The current state's handle method will be
@@ -8,13 +8,13 @@ HEAD
 	implement the interface of Device::Ericsson::AccessoryMenu::State, 
  	and that they will be named Device::Ericsson::AccessoryMenu::$state.
 
-	moved send_menu over to Menu->on_enter
+	INCOMPATIBLE CHANGE moved send_menu over to Menu->on_enter
 
 	reimplemented send_text as a thin shim around enter_state( 'Text' )
 
 	implemented mouse_move as a similar shim
 
-	worked over examples/remote to be much more functional.
+	worked over examples/remote to be much more functional
 
 
 0.5	Thursday 14th June, 2003
