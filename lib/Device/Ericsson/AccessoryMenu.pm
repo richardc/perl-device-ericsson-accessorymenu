@@ -199,6 +199,7 @@ sub send_text {
     $self->send( join ',', qq{AT*EAID=14,2,"$title"}, map { qq{"$_"} } @_ );
     $self->expect( 'OK' );
     do {} while !$self->expect;
+    return;
 }
 
 
