@@ -37,12 +37,21 @@ $remote->menu( [
                     },
                    );
                 return;
-            }
+            },
+            "Now Playing"  => sub {
+                return "nothing" unless $xmms->is_playing;
+                my $pos = $xmms->get_playlist_pos + 1;
+                my ($rate, $freq, $nch) = $xmms->get_info;
+                return join( '',
+                             $pos, " of ", $xmms->get_playlist_length,
+                             ". ", $xmms->get_playlist_titles->[ $pos - 1 ],
+                             " ",  $xmms->get_output_timestr,
+                            );
+            },
            ],
         hello  => sub { my $r = shift; $r->send_text('hello, world', "isn't this fun"); return },
         time   => sub { scalar localtime },
         menu   => sub { [ foo => 'bar',] },
-        test   => sub { $_[0]->do_wait(qq{AT*EAID=4,2,"foo",10,70}); return },
        ],
    ]);
 
