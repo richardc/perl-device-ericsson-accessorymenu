@@ -52,14 +52,29 @@ $remote->menu( [
            ],
         # a bunch of bookmarklets
         Galeon => [
-            Back     => sub { galeon 'back()' },
-            Forward  => sub { galeon 'forward()' },
-            # XXX complicty with podblog
-            Previous => sub { galeon 'document.location = document.getElementById("prev").href' },
-            Next     => sub { galeon 'document.location = document.getElementById("next").href' },
-            Top      => sub { galeon 'scrollBy(0, -document.body.scrollTop)' },
-            Up       => sub { galeon 'scrollBy(0, -window.innerHeight)' },
-            Down     => sub { galeon 'scrollBy(0,  window.innerHeight)' },
+            Back    => sub { galeon 'back()' },
+            Forward => sub { galeon 'forward()' },
+            Prev    => sub {
+                galeon q{
+                    LE = document.getElementsByTagName('LINK');
+                    for (i=0; i<LE.length; i++) {
+                        if (LE[i].rel == 'prev')
+                            document.location = LE[i].href;
+                    }
+                };
+            },
+            Next    => sub {
+                galeon q{
+                    LE = document.getElementsByTagName('LINK');
+                    for (i=0; i<LE.length; i++) {
+                        if (LE[i].rel == 'next')
+                            document.location = LE[i].href;
+                    }
+                };
+            },
+            Down    => sub { galeon 'scrollBy(0,  window.innerHeight)' },
+            Up      => sub { galeon 'scrollBy(0, -window.innerHeight)' },
+            Top     => sub { galeon 'scrollBy(0, -document.body.scrollTop)' },
            ],
         Test => [
             "Send Text" => sub {
