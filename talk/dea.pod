@@ -124,7 +124,7 @@ splitting up the AT-slinging code from the actions
  
  my $xmms = Xmms::Remote->new;
  my $menu = Device::Ericsson::AccessoryMenu->new(
-     port => Device::SerialPort->open( '/dev/rfcomm0' ) || die,
+     port => Device::SerialPort->new( '/dev/rfcomm0' ) || die,
      menu => [ XMMS => [
                   "Play/Pause" => sub {
                        $xmms->is_playing ? $xmms->pause : $xmms->play;
@@ -135,6 +135,8 @@ splitting up the AT-slinging code from the actions
                  ],
 	     ],
  );
+
+ $menu->register_menu;
 
  $menu->control while 1;
 
@@ -311,7 +313,7 @@ Well, anything you can write Perl for at least
 =back
 
 
-=head2 A Demo
+=head2 X11
 
 =over
 
@@ -325,8 +327,38 @@ And remap the events into X11 key presses/releases
 
 =item
 
-# XXX sample code
+ #!/usr/local/bin/perl -w
+ use lib qw(lib);
+ use strict;
+ use Device::Ericsson::AccessoryMenu;
+ use Device::SerialPort;
+ use X11::GUITest qw(PressKey ReleaseKey); # local modified version
 
+ my $port = shift || '/dev/rfcomm0';
+
+ my %keymap1 = ( ... );
+ my %keymap2 = ( ... );
+
+ sub translate_keys {
+     my $remote = shift;
+     my %keymap = @_;
+     $remote->mouse_mode( callback => sub {
+                              my ($key, $updown) = @_;
+                              return unless exists $keymap{$key};
+                              $updown ? PressKey($keymap{$key})
+                                      : ReleaseKey($keymap{$key});
+                          });
+ }
+
+
+ my $menu = Device::Ericsson::AccessoryMenu->new(
+     port => Device::SerialPort->new( $port ) || die,
+     menu => [ XKeys => [
+         Map1 => sub { translate_keys( shift, %keymap1 ) },
+         Map2 => sub { translate_keys( shift, %keymap2 ) },
+        ],
+     ],
+    );
 
 =back
 
@@ -345,8 +377,6 @@ With luck someone will write a nice frontend for building menus,
 possibly shipping a bunch of precanned menus
 
 =back
-
-=head2 Questions
 
 =head1 Footer
 

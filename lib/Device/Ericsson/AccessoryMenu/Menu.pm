@@ -14,7 +14,7 @@ sub _get_pairs {
         push @pairs, [ shift @entries, shift @entries ];
     }
     print map { "$_->[0]: $_->[1]\n"} @pairs
-      if $self->debug;
+      if $self->debug && 0;
     return @pairs;
 }
 
