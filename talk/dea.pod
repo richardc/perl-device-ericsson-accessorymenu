@@ -37,9 +37,11 @@ allow me to trigger things from my phone.
 
 =item
 
-# XXX image of a phone menu
+L<image:Connect|c_2.jpg>
+L<image:Accessories|c_3.jpg>
+L<image:XMMS Remote|c_7.jpg>
 
-L<image:a menu|bar.jpeg>
+Images stolen from L<http://www.linuxbrit.net/bluexmms/>
 
 =back
 
@@ -52,13 +54,23 @@ L<image:a menu|bar.jpeg>
 
 Mac OS X applications
 
-# XXX screenshots
+L<image:Clicker|SEC_Phone_Menu.gif>
 
 =item
 
 You write your actions in applescript
 
-# XXX some applescript
+ tell application "Safari"
+   activate
+   set the URL of document 1 to "http://www.XXXXXXX.com"
+   my new_tab()
+   set the URL of document 1 to "http://www.XXXXXX.com"
+ end tell
+ on new_tab()
+   tell application "Safari" to activate
+   tell application "System Events"
+     tell process "Safari"
+       event prcsclic
 
 =back
 
@@ -137,7 +149,7 @@ splitting up the AT-slinging code from the actions
 
 We can invoke other kinds of widgets too, like this volume slider
 
-# XXX image
+L<image:Volume control|c_5.jpg>
 
 =item
 
@@ -201,7 +213,7 @@ Do something stateful.
 
 =item
 
-# XXX picture of pie
+L<image:Pie!|apple-pie.jpeg>
 
 =item
 
@@ -271,7 +283,7 @@ That's all there is to it.
 
 =item
 
-# XXX picture of Bob Holness
+L<image:Bob Holness|bobholness_card.gif>
 
 =back
 
