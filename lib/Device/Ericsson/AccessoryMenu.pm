@@ -156,8 +156,10 @@ sub register_menu {
     $self->parents( [] );
     $self->current_menu( $self->menu );
 
+    # Phone, Kree!
     $self->send( "ATZ" );
     $self->expect( "OK", 5000 );
+    # turn off echo
     $self->send( "ATE=0" );
     $self->expect( "OK" );
     $self->send( 'AT*EAM="'. $self->menu->[0] . '"' );
@@ -203,10 +205,10 @@ sub send_text {
 =head2 percent_slider( %args )
 
  %args = (
-    title => 'Slider',
-    steps => 10,    # 1..10
-    value => 50,
-    callback => undef, # a subroute refernce
+    title    => 'Slider',
+    steps    => 10,    # 1..10
+    value    => 50,
+    callback => undef, # a subroutine ref, will be called with the new value
  );
 
 =cut
@@ -230,6 +232,51 @@ sub percent_slider {
         return $value if ($got =~ /^\*EAII: 4/);
         return if $got eq '*EAII: 0'; # no
     }
+}
+
+=head2 mouse_mode( %args )
+
+ %args = (
+    title    => 'Mouse',
+    callback => sub ( $key, $updown ) {}, # a subroutine ref, will be
+                                          # called with the key and
+                                          # the updown event (1 = key
+                                          # down, 0 = key up)
+
+ );
+
+=cut
+
+sub mouse_mode {
+    my $self = shift;
+    my %args = @_;
+
+    my $title = $args{title} || 'Mouse';
+    # show the user a dialog they can quit from
+    $self->send( qq{AT*EAID=13,2,"$title"} );
+    $self->expect( 'OK' );
+    # and put them into Event Reporting mode.
+    $self->send( qq{AT+CMER=3,2,0,0,0} );
+    $self->expect( 'OK' );
+    my $upup = 0;
+    while (1) {
+        my $got = $self->expect("\r");
+        next unless defined $got;
+        if ($got =~ /\+CKEV: (?:(.),(.))?/) {
+            my ($key, $updown) = ($1, $2);
+            unless (defined $key) {
+                # this seems glitchy on my phone. oh well - hack it
+                $key    = "^";
+                $updown = $upup ^= 1;
+            }
+            $args{callback}->($key, $updown) if $args{callback};
+        }
+        last if $got =~ /\*EAII/; # backup
+    }
+    # reset spy mode
+    $self->send( qq{AT+CMER=0,0,0,0,0} );
+    $self->expect( 'OK' );
+    return;
 }
 
 
@@ -274,7 +321,8 @@ sub control {
             $self->current_menu( [ $name => $action ] );
             $item = 1;
         }
-        $self->send_text( $name, $action ) if defined $action && !ref $action;
+        $self->send_text( $name, $action )
+          if defined $action && !ref $action;
         $self->send_menu($item);
     }
 }

@@ -50,7 +50,7 @@ $remote->menu( [
                     );
             },
            ],
-        # a nuch of bookmarklets
+        # a bunch of bookmarklets
         Galeon => [
             Back     => sub { galeon 'back()' },
             Forward  => sub { galeon 'forward()' },
@@ -61,9 +61,9 @@ $remote->menu( [
             Up       => sub { galeon 'scrollBy(0, -window.innerHeight)' },
             Down     => sub { galeon 'scrollBy(0,  window.innerHeight)' },
            ],
-        hello  => sub { my $r = shift; $r->send_text('hello, world', "isn't this fun"); return },
-        time   => sub { scalar localtime },
-        menu   => sub { [ foo => 'bar',] },
+        "Send Text" => sub { my $r = shift; $r->send_text('hello, world', "isn't this fun"); return },
+        "Dynamic Menu" => sub { [ foo => 'bar',] },
+        mouse  => sub { my $r = shift; $r->mouse_mode(); },
        ],
    ]);
 
