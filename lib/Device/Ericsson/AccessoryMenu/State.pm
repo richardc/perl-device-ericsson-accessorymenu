@@ -3,6 +3,11 @@ package Device::Ericsson::AccessoryMenu::State;
 use base 'Class::Accessor::Fast';
 __PACKAGE__->mk_accessors( 'parent' );
 
+sub new {
+    my $class = shift;
+    $class->SUPER::new({ @_ });
+}
+
 sub on_exit {}
 sub on_enter {}
 

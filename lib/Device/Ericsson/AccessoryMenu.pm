@@ -165,7 +165,7 @@ sub enter_state {
     $class = __PACKAGE__."::$class";
     eval "require $class" or die $@;
 
-    my $entering =  bless { parent => $self, @_ }, $class;
+    my $entering =  $class->new( parent => $self, @_ );
     unshift @{ $self->states }, $entering;
 
     print "entering $entering\n" if $self->debug;
